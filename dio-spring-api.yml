@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-dio-deployment
+  namespace: dio-app
+  labels:
+    app: api-dio-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-dio-deployment
+  template:
+    metadata:
+      labels:
+        app: api-dio-deployment
+    spec:
+      hostname: api-dio-deployment
+      containers:
+        - name: api-dio-deployment
+          image: becaregistry.azurecr.io/wirlleyd/dio-spring-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+      imagePullSecrets:
+        - name: becaregistry-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: dio-app
+  labels:
+    app: api-service
+spec:
+  type: ClusterIP
+  selector:
+    app: api-dio-deployment
+  ports:
+    - port: 5050
+      targetPort: 5050
+      protocol: TCP
